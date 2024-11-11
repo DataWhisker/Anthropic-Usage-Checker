@@ -7,6 +7,16 @@ from datetime import datetime, timezone, timedelta
 import pytz
 from tabulate import tabulate
 
+""" 
+This is a Python script to check Anthropic API token usage.
+It uses the Anthropic API to retrieve token usage information for various models:
+
+claude-3-5-sonnet-20241022
+claude-3-5-haiku-20241022
+claude-3-opus-20240229
+claude-3-sonnet-20240229 
+claude-3-haiku-20240307
+"""
 class AnthropicUsageTracker:
     def __init__(self, config_path=None):
         """
