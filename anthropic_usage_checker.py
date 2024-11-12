@@ -182,6 +182,15 @@ class AnthropicUsageTracker:
             print(f"Error checking token usage: {e}")
             return {}
 
+def get_application_directory():
+    """Get the directory where the application or script is located"""
+    if getattr(sys, 'frozen', False):
+        # If running as compiled executable
+        return os.path.dirname(sys.executable)
+    else:
+        # If running as script
+        return os.path.dirname(os.path.abspath(__file__))
+
 def main():
     try:
         # Allow manual API key input if not found in config
@@ -215,16 +224,30 @@ def main():
         print("\nCurrent Rate Limits and Usage:")
         print(tabulate(table_data, headers=headers, tablefmt="grid", colalign=("left", "right", "right", "right", "right", "left")))
 
-        # Optional: Write to file
-        with open('anthropic_token_usage.txt', 'w') as f:
+        # Get application directory and create output file path
+        app_dir = get_application_directory()
+        output_file = os.path.join(app_dir, 'anthropic_token_usage.txt')
+
+        # Write to file in application directory
+        with open(output_file, 'w') as f:
             f.write(f"System Timezone: {tracker.local_tz}\n\n")
             f.write("Note: The rate limits shown below represent the most restrictive limits currently in effect.\n")
             f.write("These are typically per-minute limits unless a more restrictive limit (like daily) has been reached.\n\n")
             f.write("Current Rate Limits and Usage:\n")
             f.write(tabulate(table_data, headers=headers, tablefmt="grid", colalign=("left", "right", "right", "right", "right", "left")))
+        
+        print(f"\nOutput saved to: {output_file}")
+
+        # Keep terminal window open if running as executable
+        if getattr(sys, 'frozen', False):
+            print("\nPress Enter to exit...")
+            input()
 
     except Exception as e:
         print(f"❌ Error: {e}")
+        if getattr(sys, 'frozen', False):
+            print("\nPress Enter to exit...")
+            input()
 
 if __name__ == "__main__":
     main()
